@@ -6,17 +6,21 @@ RUN apt-get update && \
                        build-essential \
                        pkg-config \
                        perl \
-                       && \
-    apt-get clean
-
+                       stow
 # Install Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 # Set environment variables
 ENV PATH="/root/.cargo/bin:${PATH}"
 
-# Configure bash prompt
-RUN echo 'PS1="[\[\e[0;31m\]rust-environment@\033[38;5;208mdocker\[\e[0m\]] \W # "' >> /root/.bashrc
+# Create a new user named "docker"
+RUN useradd -ms /bin/bash docker
+
+# Switch to the new user
+USER docker
+
+# Set working directory
+WORKDIR /home/docker
 
 # Default command
 CMD ["bash"]
