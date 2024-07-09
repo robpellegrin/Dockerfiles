@@ -26,8 +26,5 @@ USER docker
 # Set working directory
 WORKDIR /home/docker
 
-# Optionally, copy dotfiles or configuration files
-# COPY dotfiles /home/docker/.dotfiles
-
 # Default command to run on container start
 CMD ["bash"]
