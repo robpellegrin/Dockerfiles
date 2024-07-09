@@ -1,3 +1,4 @@
+# Use a base image
 FROM debian:latest
 
 # Install necessary packages
@@ -11,6 +12,22 @@ RUN apt update && apt install -y \
     git \
     clangd \
     nano \
-    gh
+    gh \
+    tmux \
+    stow \
+    && rm -rf /var/lib/apt/lists/*
 
+# Create a new user named "docker"
+RUN useradd -ms /bin/bash docker
+
+# Switch to the new user
+USER docker
+
+# Set working directory
+WORKDIR /home/docker
+
+# Optionally, copy dotfiles or configuration files
+# COPY dotfiles /home/docker/.dotfiles
+
+# Default command to run on container start
 CMD ["bash"]
