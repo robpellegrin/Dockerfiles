@@ -1,0 +1,16 @@
+FROM debian:latest
+
+# Install necessary packages
+RUN apt update && apt install -y \
+    gcc \
+    g++ \
+    make \
+    valgrind \
+    cpplint \
+    cppcheck \
+    git \
+    clangd \
+    nano \
+    gh
+
+CMD ["bash"]
