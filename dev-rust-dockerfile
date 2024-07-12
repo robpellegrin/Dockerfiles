@@ -6,23 +6,31 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 # Update package list and install necessary packages
 RUN apt-get update && apt-get install -y \ 
+    sudo \
     curl \
     build-essential \
     pkg-config \
     perl \
+    htop \
+    nano \
+    tmux \
     stow
 
-# Install Rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-
-# Set environment variables
-ENV PATH="/root/.cargo/bin:${PATH}"
-
 # Create a new user named "docker"
-RUN useradd -ms /bin/bash docker
+RUN useradd -ms /bin/bash docker && echo "docker:docker" | chpasswd && adduser docker sudo
 
 # Switch to the new user
 USER docker
+
+# Set environment variables for Rust installation
+ENV CARGO_HOME=/home/docker/.cargo \
+    RUSTUP_HOME=/home/docker/.rustup \
+    PATH="/home/docker/.cargo/bin:${PATH}"
+
+# Install Rust as the "docker" user
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+RUN rustup component add clippy
 
 # Set working directory
 WORKDIR /home/docker
