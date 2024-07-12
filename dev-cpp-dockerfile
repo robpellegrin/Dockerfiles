@@ -1,18 +1,25 @@
 # Use a base image
 FROM debian:latest
 
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8
+
 # Install necessary packages
 RUN apt update && apt install -y \
     gcc \
     g++ \
+    gdb \
     make \
     valgrind \
     cpplint \
     cppcheck \
     git \
+    clang \
+    clang-tidy \
+    clang-format \
     clangd \
     nano \
-    gh \
     tmux \
     stow \
     htop \
