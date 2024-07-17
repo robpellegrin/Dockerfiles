@@ -8,7 +8,11 @@ ENV DEBIAN_FRONTEND=noninteractive \
     ANDROID_SDK_ROOT="/sdk"
 
 # Update package list and install necessary packages
-RUN apt update && apt install -y curl openjdk-17-jdk unzip
+RUN apt update && apt install -y \
+    curl \
+    openjdk-17-jdk \
+    unzip \
+    stow
 
 # Install nvm
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
@@ -17,7 +21,7 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | b
 RUN bash -c "source $NVM_DIR/nvm.sh && nvm install $NODE_VERSION"
 
 # Copy and unzip the command line tools
-COPY commandlinetools-linux-11076708_latest.zip /cmdline-tools.zip
+RUN curl -o cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
 RUN mkdir -p /sdk/cmdline-tools \
     && unzip /cmdline-tools.zip -d /sdk/cmdline-tools \
     && mv /sdk/cmdline-tools/cmdline-tools /sdk/cmdline-tools/latest
