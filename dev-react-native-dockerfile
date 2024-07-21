@@ -5,20 +5,25 @@ ENV DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8 \
     NVM_DIR="/root/.nvm" \
     NODE_VERSION="20" \
-    ANDROID_SDK_ROOT="/sdk"
+    ANDROID_SDK_ROOT="/sdk" 
 
 # Update package list and install necessary packages
 RUN apt update && apt install -y \
     curl \
     openjdk-17-jdk \
     unzip \
+    git \
     stow
 
 # Install nvm
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash 
 
 # Ensure the necessary environment variables are set for nvm
-RUN bash -c "source $NVM_DIR/nvm.sh && nvm install $NODE_VERSION"
+RUN bash -c "source $NVM_DIR/nvm.sh \
+    && nvm install $NODE_VERSION \
+    && nvm use $NODE_VERSION \
+    && npm install -g npm@latest"
+
 
 # Copy and unzip the command line tools
 RUN curl -o cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
@@ -29,11 +34,33 @@ RUN mkdir -p /sdk/cmdline-tools \
 # Set the SDK root environment variable
 ENV PATH="/sdk/cmdline-tools/latest/bin:${PATH}"
 
+# Accept all SDK licenses
 RUN yes | sdkmanager --licenses
+
+# Install Android SDK Platform 34
+RUN sdkmanager "platforms;android-34"
+
+# Install Android SDK Build Tools
+RUN sdkmanager "build-tools;34.0.0"
+
+# Install Android SDK Platform-Tools 35.0.1
+RUN sdkmanager "platform-tools"
+
+# Install NDK (Side by side) 26.1.10909125
+RUN sdkmanager "ndk;26.1.10909125"
+
+# Install cmake
+RUN sdkmanager "cmake;3.22.1"
+
+# Download and install Gradle 8.6
+RUN curl -sL https://services.gradle.org/distributions/gradle-8.6-all.zip -o /tmp/gradle.zip \
+    && unzip -d /opt/gradle /tmp/gradle.zip \
+    && rm /tmp/gradle.zip
+
+# Set PATH to include Gradle binaries
+ENV PATH="/gradle-8.6/bin:${PATH}"
 
 # Expose port 8081 for the Metro Bundler
 EXPOSE 8081
 
-# Default command to start the Metro Bundler
-#CMD ["npx", "react-native", "start", "--host", "0.0.0.0"]
 CMD ["bash"]
