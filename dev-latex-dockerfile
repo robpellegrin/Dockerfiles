@@ -1,22 +1,43 @@
+# Stage 1: Base image for installing TeX Live
 FROM debian:latest
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8
 
-RUN apt update && apt install -y \ 
-    curl\
-    perl\
-    texlive-extra-utils \
+# Update and install essential packages
+RUN apt update && apt install -y \
+    curl \
+    perl \
+    texlive \
+    texlive-latex-base \
+    texlive-latex-extra \
+    texlive-fonts-recommended \
+    texlive-fonts-extra \
+    texlive-pictures \
+    chktex \
     git \
-    stow
+    stow \
+    sudo \
+    wget \
+    evince \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN curl -L -o install-tl-unx.tar.gz https://mirror.math.princeton.edu/pub/CTAN/systems/texlive/tlnet/install-tl-unx.tar.gz
-# https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
+# Download and install TeX Live
+RUN curl -L -o install-tl-unx.tar.gz https://mirror.math.princeton.edu/pub/CTAN/systems/texlive/tlnet/install-tl-unx.tar.gz \
+    && tar -xzf install-tl-unx.tar.gz \
+    && perl install-tl-*/install-tl --no-interaction \
+    && rm -rf install-tl-*
 
-RUN zcat < install-tl-unx.tar.gz | tar xf -
+# Download latexindent
+RUN curl -L -o latexindent-linux https://github.com/cmhughes/latexindent.pl/releases/download/V3.24.4/latexindent-linux \
+    && chmod +x latexindent-linux \
+    && mv latexindent-linux /usr/local/bin/latexindent
 
-RUN perl install-tl-*/install-tl --no-interaction
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8
 
 # Create a new user named "docker"
 RUN useradd -ms /bin/bash docker && echo "docker:docker" | chpasswd && adduser docker sudo
@@ -26,6 +47,5 @@ USER docker
 
 # Set the PATH environment variable
 ENV PATH="/usr/local/texlive/2024/bin/x86_64-linux:${PATH}"
-ENV LATEXINDENT_CONFIG="/root/mysettings.yaml"
 
 CMD ["bash"]
