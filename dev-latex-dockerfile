@@ -30,14 +30,8 @@ RUN curl -L -o install-tl-unx.tar.gz https://mirror.math.princeton.edu/pub/CTAN/
     && rm -rf install-tl-*
 
 # Download latexindent
-RUN curl -L -o latexindent-linux https://github.com/cmhughes/latexindent.pl/releases/download/V3.24.4/latexindent-linux \
-    && chmod +x latexindent-linux \
-    && mv latexindent-linux /usr/local/bin/latexindent
-
-
-# Set environment variables
-ENV DEBIAN_FRONTEND=noninteractive \
-    LANG=C.UTF-8
+RUN curl -L -o latexindent https://github.com/cmhughes/latexindent.pl/releases/download/V3.24.4/latexindent-linux \
+    && chmod +x ./latexindent
 
 # Create a new user named "docker"
 RUN useradd -ms /bin/bash docker && echo "docker:docker" | chpasswd && adduser docker sudo
